@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package filesync;
+
+option go_package = "github.com/underthetreee/fsync/pkg/proto";
+
+service FileSyncService {
+    rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
+    rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse);
+    rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+}
+
+message File {
+    string filename = 1;
+    bytes content = 2;
+}
+
+message UploadFileRequest {
+    File file = 1;
+}
+
+message UploadFileResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message DownloadFileRequest {
+    string filename = 1;
+}
+
+message DownloadFileResponse {
+    File file = 1;
+    bool success = 2;
+    string message = 3;
+}
+
+message DeleteFileRequest {
+    string filename = 1;
+}
+
+message DeleteFileResponse {
+    bool success = 1;
+    string message = 2; 
+}
