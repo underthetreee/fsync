@@ -19,10 +19,7 @@ message UploadFileRequest {
     File file = 1;
 }
 
-message UploadFileResponse {
-    bool success = 1;
-    string message = 2;
-}
+message UploadFileResponse {}
 
 message DownloadFileRequest {
     string filename = 1;
@@ -30,15 +27,10 @@ message DownloadFileRequest {
 
 message DownloadFileResponse {
     File file = 1;
-    bool success = 2;
-    string message = 3;
 }
 
 message DeleteFileRequest {
     string filename = 1;
 }
 
-message DeleteFileResponse {
-    bool success = 1;
-    string message = 2; 
-}
+message DeleteFileResponse {}
