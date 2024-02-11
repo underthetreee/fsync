@@ -21,6 +21,7 @@ func (s *FileSyncServer) UploadFile(ctx context.Context, req *fs.UploadFileReque
 		Message: "file uploaded",
 	}, nil
 }
+
 func (s *FileSyncServer) DownloadFile(ctx context.Context, req *fs.DownloadFileRequest) (*fs.DownloadFileResponse, error) {
 	return &fs.DownloadFileResponse{
 		File:    nil,
@@ -28,6 +29,7 @@ func (s *FileSyncServer) DownloadFile(ctx context.Context, req *fs.DownloadFileR
 		Message: "file downloaded",
 	}, nil
 }
+
 func (s *FileSyncServer) DeleteFile(ctx context.Context, req *fs.DeleteFileRequest) (*fs.DeleteFileResponse, error) {
 	return &fs.DeleteFileResponse{
 		Success: true,
