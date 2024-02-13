@@ -11,14 +11,26 @@ type File struct {
 	Content  []byte
 }
 
-func ToModel(file *proto.File) (*File, error) {
+func ToModel(protoFile *proto.File) (*File, error) {
+	if protoFile == nil {
+		return nil, errors.New("file not found")
+	}
+
+	file := &File{
+		Filename: protoFile.Filename,
+		Content:  protoFile.Content,
+	}
+	return file, nil
+}
+
+func ToProto(file *File) (*proto.File, error) {
 	if file == nil {
 		return nil, errors.New("file not found")
 	}
 
-	f := &File{
+	protoFile := &proto.File{
 		Filename: file.Filename,
 		Content:  file.Content,
 	}
-	return f, nil
+	return protoFile, nil
 }

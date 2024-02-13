@@ -4,24 +4,24 @@ import (
 	"log"
 	"net"
 
-	"github.com/underthetreee/fsync/internal/server"
+	manager "github.com/underthetreee/fsync/internal/file_manager"
 	"github.com/underthetreee/fsync/internal/service"
-	manager "github.com/underthetreee/fsync/pkg/file_manager"
+	"github.com/underthetreee/fsync/internal/sync"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	m, err := manager.NewManager()
+	mng, err := manager.NewManager()
 	if err != nil {
 		log.Fatal(err)
 	}
-	svc := service.NewFileSyncService(m)
-	gRPCServer := grpc.NewServer()
-	server.Register(gRPCServer, svc)
+	svc := service.NewFileSyncService(mng)
+	srv := grpc.NewServer()
+	sync.Register(srv, svc)
 	l, _ := net.Listen("tcp", ":50051")
 
 	log.Println("gRPC server is listening on", l.Addr())
-	if err := gRPCServer.Serve(l); err != nil {
+	if err := srv.Serve(l); err != nil {
 		log.Fatal(err)
 	}
 }
