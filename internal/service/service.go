@@ -10,6 +10,7 @@ import (
 type FileManager interface {
 	CreateFile(file *model.File) error
 	GetFile(filename string) (*model.File, error)
+	DeleteFile(filename string) error
 }
 
 type FileSyncService struct {
@@ -43,4 +44,11 @@ func (s *FileSyncService) DownloadFile(ctx context.Context, filename string) (*p
 		return nil, err
 	}
 	return protoFile, nil
+}
+
+func (s *FileSyncService) DeleteFile(ctx context.Context, filename string) error {
+	if err := s.mng.DeleteFile(filename); err != nil {
+		return err
+	}
+	return nil
 }
