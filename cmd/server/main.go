@@ -5,8 +5,9 @@ import (
 	"net"
 
 	manager "github.com/underthetreee/fsync/internal/file_manager"
+	"github.com/underthetreee/fsync/internal/server"
 	"github.com/underthetreee/fsync/internal/service"
-	"github.com/underthetreee/fsync/internal/sync"
+	"github.com/underthetreee/fsync/pkg/kafka"
 	"google.golang.org/grpc"
 )
 
@@ -15,9 +16,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	svc := service.NewFileSyncService(mng)
+	broker := kafka.NewKafkaProducer()
+	svc := service.NewFileSyncService(mng, broker)
 	srv := grpc.NewServer()
-	sync.Register(srv, svc)
+	server.Register(srv, svc)
 	l, _ := net.Listen("tcp", ":50051")
 
 	log.Println("gRPC server is listening on", l.Addr())

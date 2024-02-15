@@ -4,6 +4,8 @@ package filesync;
 
 option go_package = "github.com/underthetreee/fsync/pkg/proto";
 
+import "google/protobuf/timestamp.proto";
+
 service FileSyncService {
     rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
     rpc DownloadFile(DownloadFileRequest) returns (DownloadFileResponse);
@@ -34,3 +36,16 @@ message DeleteFileRequest {
 }
 
 message DeleteFileResponse {}
+
+message FileEvent {
+    enum EventType {
+        UNKNOWN = 0;
+        UPLOAD = 1;
+        DOWNLOAD = 2;
+        DELETE = 3;
+    }
+    string filename = 1;
+    EventType type = 2;
+    
+    google.protobuf.Timestamp timestamp = 3; 
+}
