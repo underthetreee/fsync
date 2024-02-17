@@ -2,10 +2,9 @@ package kafka
 
 import (
 	"context"
-	"log"
 
 	"github.com/segmentio/kafka-go"
-	fs "github.com/underthetreee/fsync/pkg/proto"
+	"github.com/underthetreee/fsync/internal/model"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -15,16 +14,16 @@ type KafkaProducer struct {
 
 func NewKafkaProducer() *KafkaProducer {
 	w := &kafka.Writer{
-		Addr:     kafka.TCP("localhost:9092"),
-		Balancer: &kafka.LeastBytes{},
+		Addr: kafka.TCP("localhost:9092"),
 	}
 	return &KafkaProducer{
 		writer: w,
 	}
 }
 
-func (p *KafkaProducer) ProduceFileEvent(ctx context.Context, topic string, event *fs.FileEvent) error {
-	eventBytes, err := proto.Marshal(event)
+func (p *KafkaProducer) ProduceFileEvent(ctx context.Context, topic string, event *model.FileEvent) error {
+	protoEvent := model.ToProtoEvent(event)
+	eventBytes, err := proto.Marshal(protoEvent)
 	if err != nil {
 		return err
 	}
@@ -36,8 +35,6 @@ func (p *KafkaProducer) ProduceFileEvent(ctx context.Context, topic string, even
 		},
 	); err != nil {
 		return err
-
 	}
-	log.Println("event produced", eventBytes)
 	return nil
 }

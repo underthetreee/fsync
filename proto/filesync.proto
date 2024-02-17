@@ -38,14 +38,12 @@ message DeleteFileRequest {
 message DeleteFileResponse {}
 
 message FileEvent {
-    enum EventType {
+    enum EventAction {
         UNKNOWN = 0;
         UPLOAD = 1;
-        DOWNLOAD = 2;
-        DELETE = 3;
+        DELETE = 2;
     }
     string filename = 1;
-    EventType type = 2;
-    
+    EventAction action = 2;
     google.protobuf.Timestamp timestamp = 3; 
 }

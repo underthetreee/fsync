@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	fs "github.com/underthetreee/fsync/pkg/proto"
+	"github.com/underthetreee/fsync/internal/model"
 )
 
 const dirName = ".fsync"
@@ -27,20 +27,20 @@ func NewManager() (*Manager, error) {
 	}, nil
 }
 
-func (m *Manager) GetFile(filename string) (*fs.File, error) {
+func (m *Manager) GetFile(filename string) (*model.File, error) {
 	filePath := filepath.Join(m.StoragePath, filename)
 	fileContent, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	file := &fs.File{
+	file := &model.File{
 		Filename: filename,
 		Content:  fileContent,
 	}
 	return file, nil
 }
 
-func (m *Manager) CreateFile(file *fs.File) error {
+func (m *Manager) CreateFile(file *model.File) error {
 	filePath := filepath.Join(m.StoragePath, file.Filename)
 	if err := os.WriteFile(filePath, file.Content, 0644); err != nil {
 		return err
