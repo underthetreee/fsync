@@ -9,8 +9,8 @@ type File struct {
 
 func ToModelFile(protoFile *fs.File) *File {
 	return &File{
-		Filename: protoFile.Filename,
-		Content:  protoFile.Content,
+		Filename: protoFile.GetFilename(),
+		Content:  protoFile.GetContent(),
 	}
 }
 

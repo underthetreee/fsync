@@ -12,30 +12,18 @@ type FileManager interface {
 	DeleteFile(filename string) error
 }
 
-type Producer interface {
-	ProduceFileEvent(ctx context.Context, topic string, event *model.FileEvent) error
-}
-
 type FileSyncService struct {
-	mng  FileManager
-	prod Producer
+	mng FileManager
 }
 
-func NewFileSyncService(manager FileManager, producer Producer) *FileSyncService {
+func NewFileSyncService(manager FileManager) *FileSyncService {
 	return &FileSyncService{
-		mng:  manager,
-		prod: producer,
+		mng: manager,
 	}
 }
 
 func (s *FileSyncService) UploadFile(ctx context.Context, file *model.File) error {
 	if err := s.mng.CreateFile(file); err != nil {
-		return err
-	}
-
-	event := model.NewFileEvent(file.Filename, model.UPLOAD)
-
-	if err := s.prod.ProduceFileEvent(ctx, "file-upload", event); err != nil {
 		return err
 	}
 	return nil
@@ -51,12 +39,6 @@ func (s *FileSyncService) DownloadFile(ctx context.Context, filename string) (*m
 
 func (s *FileSyncService) DeleteFile(ctx context.Context, filename string) error {
 	if err := s.mng.DeleteFile(filename); err != nil {
-		return err
-	}
-
-	event := model.NewFileEvent(filename, model.DELETE)
-
-	if err := s.prod.ProduceFileEvent(ctx, "file-delete", event); err != nil {
 		return err
 	}
 	return nil

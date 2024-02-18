@@ -5,6 +5,11 @@ server:
 	go build -o bin/server cmd/server/main.go
 	./bin/server
 
+.PHONY: client 
+client:
+	go build -o bin/client cmd/client/main.go
+	./bin/client
+
 .PHONY: proto 
 proto:
 	mkdir -p pkg
