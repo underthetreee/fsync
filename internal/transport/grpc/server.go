@@ -1,8 +1,9 @@
-package server
+package grpc
 
 import (
 	"context"
 	"log"
+	"net"
 
 	"github.com/underthetreee/fsync/internal/model"
 	fs "github.com/underthetreee/fsync/pkg/proto"
@@ -23,20 +24,25 @@ type EventProducer interface {
 
 type Server struct {
 	fs.UnimplementedFileSyncServiceServer
+	srv  *grpc.Server
 	svc  FileSyncService
 	prod EventProducer
 }
 
-func Register(gRPCServer *grpc.Server, service FileSyncService, producer EventProducer) {
-	fs.RegisterFileSyncServiceServer(gRPCServer, &Server{
+func NewServer(service FileSyncService, producer EventProducer) *Server {
+	grpcServer := grpc.NewServer()
+	s := &Server{
+		srv:  grpcServer,
 		svc:  service,
 		prod: producer,
-	})
+	}
+	fs.RegisterFileSyncServiceServer(grpcServer, s)
+	return s
 }
 
 func (s *Server) UploadFile(ctx context.Context, req *fs.UploadFileRequest,
 ) (*fs.UploadFileResponse, error) {
-	file := model.ToModelFile(req.GetFile())
+	file := model.ToModel(req.GetFile())
 
 	if err := s.svc.UploadFile(ctx, file); err != nil {
 		log.Println(err)
@@ -59,7 +65,7 @@ func (s *Server) DownloadFile(ctx context.Context, req *fs.DownloadFileRequest,
 		log.Println(err)
 		return nil, status.Error(codes.NotFound, "file not found")
 	}
-	protoFile := model.ToProtoFile(file)
+	protoFile := model.ToProto(file)
 	return &fs.DownloadFileResponse{File: protoFile}, nil
 }
 
@@ -76,4 +82,12 @@ func (s *Server) DeleteFile(ctx context.Context, req *fs.DeleteFileRequest,
 		return nil, err
 	}
 	return &fs.DeleteFileResponse{}, nil
+}
+
+func (s *Server) Run(listenAddr string) error {
+	l, err := net.Listen("tcp", listenAddr)
+	if err != nil {
+		return err
+	}
+	return s.srv.Serve(l)
 }

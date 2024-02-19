@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/segmentio/kafka-go"
 	fs "github.com/underthetreee/fsync/pkg/proto"
@@ -14,8 +15,9 @@ type KafkaConsumer struct {
 
 func NewKafkaConsumer(topic string) *KafkaConsumer {
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{"localhost:9092"},
-		Topic:   topic,
+		Brokers:     []string{"localhost:9092"},
+		Topic:       topic,
+		StartOffset: kafka.LastOffset,
 	})
 	return &KafkaConsumer{
 		reader: r,
@@ -23,16 +25,19 @@ func NewKafkaConsumer(topic string) *KafkaConsumer {
 }
 
 func (c *KafkaConsumer) ConsumeFileEvent(ctx context.Context) (*fs.FileEvent, error) {
-	m, err := c.reader.ReadMessage(ctx)
+	msg, err := c.reader.ReadMessage(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	event := &fs.FileEvent{}
-	if err := proto.Unmarshal(m.Value, event); err != nil {
+	if err := proto.Unmarshal(msg.Value, event); err != nil {
 		return nil, err
 	}
-
+	slog.Info("consume event",
+		"file", event.Filename,
+		"action", event.Action,
+	)
 	return event, nil
 }
 

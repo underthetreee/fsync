@@ -7,14 +7,14 @@ type File struct {
 	Content  []byte
 }
 
-func ToModelFile(protoFile *fs.File) *File {
+func ToModel(protoFile *fs.File) *File {
 	return &File{
 		Filename: protoFile.GetFilename(),
 		Content:  protoFile.GetContent(),
 	}
 }
 
-func ToProtoFile(file *File) *fs.File {
+func ToProto(file *File) *fs.File {
 	return &fs.File{
 		Filename: file.Filename,
 		Content:  file.Content,

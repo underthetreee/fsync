@@ -2,7 +2,6 @@ package manager
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -20,8 +19,6 @@ func NewManager() (*Manager, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println("init file manager")
-
 	return &Manager{
 		StoragePath: storagePath,
 	}, nil

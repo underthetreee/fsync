@@ -2,7 +2,7 @@ package kafka
 
 import (
 	"context"
-	"log"
+	"log/slog"
 
 	"github.com/segmentio/kafka-go"
 	fs "github.com/underthetreee/fsync/pkg/proto"
@@ -37,7 +37,10 @@ func (p *KafkaProducer) ProduceFileEvent(ctx context.Context, event *fs.FileEven
 	); err != nil {
 		return err
 	}
-	log.Println("produce file event", eventBytes)
+	slog.Info("produce event",
+		"file", event.Filename,
+		"action", event.Action,
+	)
 	return nil
 }
 

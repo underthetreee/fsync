@@ -4,20 +4,26 @@ import (
 	"context"
 	"log"
 
-	"github.com/underthetreee/fsync/pkg/kafka"
+	"github.com/underthetreee/fsync/internal/kafka"
+	"github.com/underthetreee/fsync/internal/transport/grpc"
 )
 
-const kafkaTopic = "sync"
+const (
+	kafkaTopic = "sync"
+	listenAddr = ":50051"
+)
 
 func main() {
 	ctx := context.Background()
+
 	broker := kafka.NewKafkaConsumer(kafkaTopic)
 	defer broker.Close()
-	for {
-		event, err := broker.ConsumeFileEvent(ctx)
-		if err != nil {
-			log.Println("read message:", err)
-		}
-		log.Printf("filename: %v, action: %v\n", event.Filename, event.Action)
+
+	c, err := grpc.NewClient(listenAddr, broker)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := c.InitEventLoop(ctx); err != nil {
+		log.Fatal(err)
 	}
 }
