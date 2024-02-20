@@ -15,9 +15,10 @@ type KafkaProducer struct {
 
 func NewKafkaProducer(topic string) *KafkaProducer {
 	w := &kafka.Writer{
-		Addr:  kafka.TCP("localhost:9092"),
-		Topic: topic,
-		Async: true,
+		Addr:                   kafka.TCP("localhost:9092"),
+		Topic:                  topic,
+		Async:                  true,
+		AllowAutoTopicCreation: true,
 	}
 	return &KafkaProducer{
 		writer: w,
@@ -31,7 +32,7 @@ func (p *KafkaProducer) ProduceFileEvent(ctx context.Context, event *fs.FileEven
 	}
 	if err = p.writer.WriteMessages(ctx,
 		kafka.Message{
-			Key:   []byte(event.Filename),
+			Key:   []byte(event.GetFilename()),
 			Value: eventBytes,
 		},
 	); err != nil {

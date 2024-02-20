@@ -15,9 +15,8 @@ type KafkaConsumer struct {
 
 func NewKafkaConsumer(topic string) *KafkaConsumer {
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:     []string{"localhost:9092"},
-		Topic:       topic,
-		StartOffset: kafka.LastOffset,
+		Brokers: []string{"localhost:9092"},
+		Topic:   topic,
 	})
 	return &KafkaConsumer{
 		reader: r,
@@ -29,7 +28,6 @@ func (c *KafkaConsumer) ConsumeFileEvent(ctx context.Context) (*fs.FileEvent, er
 	if err != nil {
 		return nil, err
 	}
-
 	event := &fs.FileEvent{}
 	if err := proto.Unmarshal(msg.Value, event); err != nil {
 		return nil, err

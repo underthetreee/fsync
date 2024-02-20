@@ -59,8 +59,7 @@ func (s *Server) UploadFile(ctx context.Context, req *fs.UploadFileRequest,
 
 func (s *Server) DownloadFile(ctx context.Context, req *fs.DownloadFileRequest,
 ) (*fs.DownloadFileResponse, error) {
-	filename := req.GetFilename()
-	file, err := s.svc.DownloadFile(ctx, filename)
+	file, err := s.svc.DownloadFile(ctx, req.GetFilename())
 	if err != nil {
 		log.Println(err)
 		return nil, status.Error(codes.NotFound, "file not found")
@@ -71,13 +70,12 @@ func (s *Server) DownloadFile(ctx context.Context, req *fs.DownloadFileRequest,
 
 func (s *Server) DeleteFile(ctx context.Context, req *fs.DeleteFileRequest,
 ) (*fs.DeleteFileResponse, error) {
-	filename := req.GetFilename()
-	if err := s.svc.DeleteFile(ctx, filename); err != nil {
+	if err := s.svc.DeleteFile(ctx, req.GetFilename()); err != nil {
 		log.Println(err)
 		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
-	event := model.NewFileEvent(filename, model.DELETE)
+	event := model.NewFileEvent(req.GetFilename(), model.DELETE)
 	if err := s.prod.ProduceFileEvent(ctx, event); err != nil {
 		return nil, err
 	}

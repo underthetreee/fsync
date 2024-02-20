@@ -7,7 +7,7 @@ import (
 )
 
 type FileManager interface {
-	CreateFile(file *model.File) error
+	StoreFile(file *model.File) error
 	GetFile(filename string) (*model.File, error)
 	DeleteFile(filename string) error
 }
@@ -23,7 +23,7 @@ func NewFileSyncService(manager FileManager) *FileSyncService {
 }
 
 func (s *FileSyncService) UploadFile(ctx context.Context, file *model.File) error {
-	if err := s.mng.CreateFile(file); err != nil {
+	if err := s.mng.StoreFile(file); err != nil {
 		return err
 	}
 	return nil

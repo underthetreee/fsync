@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	manager "github.com/underthetreee/fsync/internal/file_manager"
 	"github.com/underthetreee/fsync/internal/kafka"
 	"github.com/underthetreee/fsync/internal/transport/grpc"
 )
@@ -19,11 +20,16 @@ func main() {
 	broker := kafka.NewKafkaConsumer(kafkaTopic)
 	defer broker.Close()
 
-	c, err := grpc.NewClient(listenAddr, broker)
+	mng, err := manager.NewManager()
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := c.InitEventLoop(ctx); err != nil {
+
+	c, err := grpc.NewClient(listenAddr, broker, mng)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := c.SyncLoop(ctx); err != nil {
 		log.Fatal(err)
 	}
 }

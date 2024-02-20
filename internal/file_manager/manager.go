@@ -1,14 +1,17 @@
 package manager
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/underthetreee/fsync/internal/model"
 )
 
-const dirName = ".fsync"
+const (
+	dirName         = ".fsync"
+	filePermissions = 0644
+	dirPermissions  = 0755
+)
 
 type Manager struct {
 	StoragePath string
@@ -37,9 +40,9 @@ func (m *Manager) GetFile(filename string) (*model.File, error) {
 	return file, nil
 }
 
-func (m *Manager) CreateFile(file *model.File) error {
+func (m *Manager) StoreFile(file *model.File) error {
 	filePath := filepath.Join(m.StoragePath, file.Filename)
-	if err := os.WriteFile(filePath, file.Content, 0644); err != nil {
+	if err := os.WriteFile(filePath, file.Content, filePermissions); err != nil {
 		return err
 	}
 	return nil
@@ -56,14 +59,14 @@ func (m *Manager) DeleteFile(filename string) error {
 func initStorage() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	storagePath := filepath.Join(homeDir, dirName)
 
 	if _, err := os.Stat(storagePath); os.IsNotExist(err) {
-		if err := os.Mkdir(storagePath, 0755); err != nil {
-			return "", fmt.Errorf("create directory: %w", err)
+		if err := os.Mkdir(storagePath, dirPermissions); err != nil {
+			return "", err
 		}
 	}
 	return storagePath, nil
