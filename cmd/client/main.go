@@ -30,6 +30,6 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := c.SyncLoop(ctx); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }

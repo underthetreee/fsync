@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/segmentio/kafka-go"
 	fs "github.com/underthetreee/fsync/pkg/proto"
@@ -38,9 +39,11 @@ func (p *KafkaProducer) ProduceFileEvent(ctx context.Context, event *fs.FileEven
 	); err != nil {
 		return err
 	}
+	timestamp := time.Unix(event.Timestamp.Seconds, int64(event.Timestamp.Nanos)).Format(time.RFC822)
 	slog.Info("produce event",
 		"file", event.Filename,
 		"action", event.Action,
+		"timestamp", timestamp,
 	)
 	return nil
 }

@@ -40,6 +40,7 @@ func NewClient(listenAddr string, consumer EventConsumer, manager FileManager) (
 }
 
 func (c *Client) UpdateFile(ctx context.Context, filename string) error {
+
 	resp, err := c.client.DownloadFile(ctx, &fs.DownloadFileRequest{Filename: filename})
 	if err != nil {
 		log.Println(err)
@@ -57,6 +58,7 @@ func (c *Client) DeleteFile(ctx context.Context, filename string) error {
 }
 
 func (c *Client) SyncLoop(ctx context.Context) error {
+	log.Println("init sync loop")
 	for {
 		event, err := c.consumer.ConsumeFileEvent(ctx)
 		if err != nil {

@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/underthetreee/fsync/internal/model"
+	"github.com/underthetreee/fsync/internal/validation"
 	fs "github.com/underthetreee/fsync/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -42,15 +43,18 @@ func NewServer(service FileSyncService, producer EventProducer) *Server {
 
 func (s *Server) UploadFile(ctx context.Context, req *fs.UploadFileRequest,
 ) (*fs.UploadFileResponse, error) {
-	file := model.ToModel(req.GetFile())
-
+	protoFile := req.GetFile()
+	if err := validation.ValidateFile(protoFile); err != nil {
+		log.Println(err)
+		return nil, status.Error(codes.InvalidArgument, "invalid input")
+	}
+	file := model.ToModel(protoFile)
 	if err := s.svc.UploadFile(ctx, file); err != nil {
 		log.Println(err)
 		return nil, status.Error(codes.Internal, "internal server error")
 	}
 
 	event := model.NewFileEvent(file.Filename, model.UPLOAD)
-
 	if err := s.prod.ProduceFileEvent(ctx, event); err != nil {
 		return nil, err
 	}
